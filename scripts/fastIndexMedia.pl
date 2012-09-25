@@ -19,7 +19,7 @@ $dbh->do("SET NAMES UTF8")
 
 print "Recursively indexing media in current directory\n";
 
-$path = './';
+$path = '../www';
 
 $fileList = 'fileList.txt';
 #$fileList = 'testFiles.txt';
