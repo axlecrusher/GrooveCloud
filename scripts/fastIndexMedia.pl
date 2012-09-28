@@ -26,6 +26,12 @@ $fileList = 'fileList.txt';
 
 `find -L $path -type f -name '*.m4a' -o -name '*.mp3' > $fileList`;
 
+if ( -f 'fileListLast.txt')
+{
+	`fgrep -xv -f fileListLast.txt fileList.txt > fileListDiff.txt`;
+	$fileList = 'fileListDiff.txt';
+}
+
 $processCounter = 0;
 
 $SIG{CHLD} = \&ReapProcess;
@@ -41,6 +47,8 @@ for (my $i = 0; $i<$len; $i+=100)
 
 
 WaitForProcesses(0);
+
+`cp fileList.txt fileListLast.txt`;
 
 sub ReapProcess
 {
@@ -272,6 +280,7 @@ sub CreateWordMap()
 	my ($data) = @_;
 
 	my $s = $data->{Title} . ' ' . $data->{Artist} . ' ' . $data->{Album} . ' ' . $data->{Genre} . ' ' . $data->{Year};
+	$s =~ s/[^\w\s]//g;
 
 #	print "$s\n";
 	my @words = split(/\s+/, $s);
