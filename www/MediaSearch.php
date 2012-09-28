@@ -51,20 +51,22 @@
 				$this->mysqli->query($xxx)
 					or die("Query failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error);
 
-				$tables = 'result';
+				$table = 'result';
 			}
 			else
 			{
-				$tables = 'temp0';
+				$table = 'temp0';
 			}
 
-			$stmt = $this->mysqli->prepare("select $tables.media_no,title,artist_rec.txt,album_rec.txt,genre_rec.txt,media_rec.path
-				from $tables,media_rec,artist_rec,album_rec,genre_rec
-				where $tables.media_no=media_rec.media_no
-				and media_rec.artist_no=artist_rec.artist_no
-				and media_rec.album_no=album_rec.album_no
-				and media_rec.genre_no=genre_rec.genre_no")
-				or die ("Prepare failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error);
+			$sql = "select $table.media_no,title,artist_rec.txt,album_rec.txt,genre_rec.txt,media_rec.path
+				from $table,
+				media_rec left outer join artist_rec on media_rec.artist_no=artist_rec.artist_no
+				left outer join album_rec on media_rec.album_no=album_rec.album_no
+				left outer join genre_rec on media_rec.genre_no=genre_rec.genre_no
+				where $table.media_no=media_rec.media_no";
+				
+			$stmt = $this->mysqli->prepare($sql)
+				or die ("Prepare failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error . $sql);
 
 			$stmt->execute()
 				or die("Execute failed: (" . $stmt->errno . ") " . $stmt->error);
