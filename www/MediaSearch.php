@@ -74,13 +74,13 @@
 			$results = array();
 
 			$media = new MediaRecord();
-			$stmt->bind_result ( $media_no, $media->Title,$media->Artist,$media->Album,$media->Genre,$media->Path );
+			$stmt->bind_result ( $media->Serial, $media->Title,$media->Artist,$media->Album,$media->Genre,$media->Path );
 
 			while ($stmt->fetch())
 			{
 				$results[] = $media;
 				$media = new MediaRecord();
-				$stmt->bind_result ( $media_no, $media->Title,$media->Artist,$media->Album,$media->Genre,$media->Path );
+				$stmt->bind_result ( $media->Serial, $media->Title,$media->Artist,$media->Album,$media->Genre,$media->Path );
 			}
 
 			return $results;
@@ -90,6 +90,7 @@
 
 	class MediaRecord
 	{
+		public $Serial;
 		public $Title;
 		public $Album;
 		public $Artist;

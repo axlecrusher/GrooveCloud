@@ -1,3 +1,6 @@
+<?php
+	require "Sessions.php";
+?>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -50,7 +53,18 @@ $('.jp-playlist ul:last').sortable({
          }
      });
 
+
+	$("#notes-save").click(function() {
+		var data = $( "#addNotesForm" ).serialize();
+		$.post('AddNote.php', data, function(data) {
+			$( "#addNodeDialog" ).hide();
+		});
+	});
  
+	$("#notes-cancel").click(function() {
+		$( "#addNodeDialog" ).hide();
+	});
+
 });
 
 function doSearch()
@@ -82,6 +96,22 @@ function addSong(title,artist,path)
 	$( ".jp-playlist ul" ).disableSelection();
 
 }
+
+function showNotes(serial,hash)
+{
+	$('#noteSerial').val(serial);
+	$('#noteHash').val(hash);
+	$('#notes').val('');
+	$( "#addNodeDialog" ).show();
+
+	var data = $( "#addNotesForm" ).serialize();
+	thxr = $.post('GetNote.php', data, function(data, status, jqXHR) {
+		if (thxr === jqXHR)
+		{
+			$('#notes').val(data);
+		}
+	});
+}
   </script>
 </head>
 	<body>
@@ -97,6 +127,15 @@ function addSong(title,artist,path)
 	</div>
 	<div id="results" style="display:none;">	
 	</div>
+	<form id="addNotesForm">
+		<div class="addNotesDialog" id="addNodeDialog">
+			<textarea rows="10" cols="50" id="notes" name="note"></textarea>
+			<input type="hidden" id="noteSerial" name="s" value=""/>
+			<input type="hidden" id="noteHash" name="h" value=""/>
+			<a href="javascript:;" id="notes-save">Save</a>
+			<a href="javascript:;" id="notes-cancel">Cancel</a>
+		</div>
+	</form>
 </div>
 <div id="jquery_jplayer_1" class="jp-jplayer"></div>
   <div id="jp_container_1" class="jp-audio">

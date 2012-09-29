@@ -121,3 +121,12 @@ span.jp-artist {
 div.jp-audio ul.jp-controls {
 	width: 420px;
 }
+
+.addNotesDialog
+{
+	background: #999;
+	float: left;
+	position: absolute;
+	top: 0;
+	display: none;
+}
