@@ -57,12 +57,12 @@ $('.jp-playlist ul:last').sortable({
 	$("#notes-save").click(function() {
 		var data = $( "#addNotesForm" ).serialize();
 		$.post('AddNote.php', data, function(data) {
-			$( "#addNodeDialog" ).hide();
+			$( "#addNotesForm" ).hide();
 		});
 	});
  
 	$("#notes-cancel").click(function() {
-		$( "#addNodeDialog" ).hide();
+		$( "#addNotesForm" ).hide();
 	});
 
 });
@@ -97,15 +97,17 @@ function addSong(title,artist,path)
 
 }
 
-function showNotes(serial,hash)
+function showNotes(serial,hash,title)
 {
 	$('#noteSerial').val(serial);
 	$('#noteHash').val(hash);
 	$('#notes').val('');
-	$( "#addNodeDialog" ).show();
+	$('#addNotesForm').show();
+	$('#noteTitle').text(title);
 
 	var data = $( "#addNotesForm" ).serialize();
-	thxr = $.post('GetNote.php', data, function(data, status, jqXHR) {
+	thxr = $.post('GetNote.php', data, function(data, status, jqXHR)
+	{
 		if (thxr === jqXHR)
 		{
 			$('#notes').val(data);
@@ -123,19 +125,10 @@ function showNotes(serial,hash)
 		</div>
 </div>
 <div id="content">
-	<div id="spinner" style="display:none;"><img src="290.gif" width="64" height="64"/>
+	<div id="spinner" style="display:none;"><img src="images/290.gif" width="64" height="64"/>
 	</div>
 	<div id="results" style="display:none;">	
 	</div>
-	<form id="addNotesForm">
-		<div class="addNotesDialog" id="addNodeDialog">
-			<textarea rows="10" cols="50" id="notes" name="note"></textarea>
-			<input type="hidden" id="noteSerial" name="s" value=""/>
-			<input type="hidden" id="noteHash" name="h" value=""/>
-			<a href="javascript:;" id="notes-save">Save</a>
-			<a href="javascript:;" id="notes-cancel">Cancel</a>
-		</div>
-	</form>
 </div>
 <div id="jquery_jplayer_1" class="jp-jplayer"></div>
   <div id="jp_container_1" class="jp-audio">
@@ -183,5 +176,19 @@ function showNotes(serial,hash)
 
     </div>
   </div>
+	<form id="addNotesForm">
+		<div width="100%">
+			<div class="addNotesDialog">
+				<div>Editing notes for <span id="noteTitle"></span></div>
+				<textarea rows="10" id="notes" name="note"></textarea>
+				<input type="hidden" id="noteSerial" name="s" value=""/>
+				<input type="hidden" id="noteHash" name="h" value=""/>
+				<br/>
+				<a href="javascript:;" id="notes-save">Save</a>
+				<a href="javascript:;" id="notes-cancel">Cancel</a>
+			</div>
+		</div>
+	</form>
+
 	</body>
 </html>

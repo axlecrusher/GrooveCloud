@@ -16,7 +16,7 @@
 
 
 		echo '<div id="resultSet"><table style="width: 100%;text-align: left;"><tbody>';
-		echo "<tr><th>Title</th><th>Album</th><th>Artist</th></tr>";
+		echo "<tr><th>Title</th><th>Album</th><th>Artist</th><th></th></tr>";
 		foreach ($results as $r)
 		{
 			$addr = $host . str_replace('%2F', '/', rawurlencode($r->Path));
@@ -32,7 +32,7 @@
 			$hSerial = HashData( $r->Serial );
 
 			echo <<<EOF
-<tr><td><a href='javascript:addSong("$jTitle","$jArtist","$addr");'>$webTitle</a></td><td>$webAlbum</td><td>$webArtist</td><td><a href='javascript:showNotes($r->Serial,"$hSerial");'>Add Notes</a></td></tr>
+<tr><td><a href='javascript:addSong("$jTitle","$jArtist","$addr");'>$webTitle</a></td><td>$webAlbum</td><td>$webArtist</td><td><a class="addNoteButton" href='javascript:showNotes($r->Serial,"$hSerial","$webTitle");' title="Edit Notes">Add Notes</a></td></tr>
 EOF;
 		}
 		echo "</tbody><table></div>";
