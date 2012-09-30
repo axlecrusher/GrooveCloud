@@ -14,6 +14,7 @@
 
 		function Search($searchString)
 		{
+			$searchString = preg_replace("/[^\w\s]/", '', $searchString);
 			$search = trim($searchString);
 
 			$terms = preg_split('/\s+/', $search);
@@ -27,7 +28,7 @@
 			if ($termsCount > 20) return "Too many search terms";
 
 //			$this->mysqli->query("create temporary table word_matches(word_no smallint not null, primary key(word_no)) engine=MEMORY");
-			$this->mysqli->query("create temporary table word_matches(word_no smallint not null, primary key(word_no)) engine=MEMORY"); //so small key probably not needed
+			$this->mysqli->query("create temporary table word_matches(word_no smallint not null) engine=MEMORY"); //so small key probably not needed
 			$this->mysqli->query("create temporary table results(media_no smallint not null, primary key(media_no)) engine=MEMORY");
 
 			$sql = "insert ignore into word_matches
