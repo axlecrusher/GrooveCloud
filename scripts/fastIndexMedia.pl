@@ -170,7 +170,7 @@ sub ProcessSQL()
 	$data->{AlbumNumber} = GetAlbumNumber($data->{Album});
 	$data->{GenreNumber} = GetGenreNumber($data->{Genre});
 
-	InsertMediaRecord($data);
+	$data->{MediaNo} = InsertMediaRecord($data);
 	CreateWordMap($data);
 }
 
@@ -267,11 +267,19 @@ sub InsertMediaRecord()
 {
 	my ($data) = @_;
 
-	my $q = PrepareStatement("insert ignore into media_rec (path,title,album_no,artist_no,genre_no,track_number,year,duration,filesize) values (?,?,?,?,?,?,?,?,?)");
-	$q->execute($data->{path}, $data->{Title},$data->{AlbumNumber},$data->{ArtistNumber},$data->{GenreNumber},
+	my $q = PrepareStatement("insert ignore into media_rec (album_no,artist_no,genre_no,track_number,year,duration,filesize) values (?,?,?,?,?,?,?)");
+	my $qt = PrepareStatement("insert ignore into title_rec (media_no,title) values (?,?)");
+	my $qp = PrepareStatement("insert ignore into path_rec (media_no,path) values (?,?)");
+
+	$q->execute($data->{AlbumNumber},$data->{ArtistNumber},$data->{GenreNumber},
 		$data->{TrackNumber}, $data->{Year}, $data->{MediaDuration}, $data->{FileSize});
 
-	my $r = $q->{ix_sqlerrd}[1];
+	my $r = $dbh->{ q{mysql_insertid} }; #last insert ID
+
+	$qp->execute($r, $data->{path}) or die("Could not insert path");
+
+	$qt->execute($r, $data->{Title}) or die("Could not insert title");
+
 	return $r;
 }
 
@@ -286,12 +294,12 @@ sub CreateWordMap()
 	my @words = split(/\s+/, $s);
 	chomp($words);
 	my $q = PrepareStatement("insert ignore into word_table (txt) values (?)");
-	my $q2 = PrepareStatement("insert ignore into word_map set media_no=(select media_no from media_rec where path=?), word_no=(select word_no from word_table where txt=?)");
+	my $q2 = PrepareStatement("insert ignore into word_map set media_no=?, word_no=(select word_no from word_table where txt=?)");
 
 	foreach my $w (@words)
 	{
 		$q->execute($w) if ($w ne '');
-		$q2->execute($data->{path},$w) if ($w ne '');
+		$q2->execute($data->{MediaNo},$w) if ($w ne '');
 	}
 }
 
