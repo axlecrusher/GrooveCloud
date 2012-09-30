@@ -16,7 +16,7 @@
 			$search = trim($searchString);
 			$terms = preg_split('/\s+/', $search);
 
-			$this->mysqli->query("create temporary table result(media_no bigint not null, primary key(media_no)) engine=MEMORY");
+			$this->mysqli->query("create temporary table result(media_no smallint not null, primary key(media_no)) engine=MEMORY");
 
 			$join = "";
 			$num = 0;
@@ -58,12 +58,14 @@
 				$table = 'temp0';
 			}
 
-			$sql = "select $table.media_no,title,artist_rec.txt,album_rec.txt,genre_rec.txt,media_rec.path
+			$sql = "select $table.media_no,title,artist_rec.txt,album_rec.txt,genre_rec.txt,path
 				from $table,
-				media_rec left outer join artist_rec on media_rec.artist_no=artist_rec.artist_no
+				path_rec,title_rec,media_rec left outer join artist_rec on media_rec.artist_no=artist_rec.artist_no
 				left outer join album_rec on media_rec.album_no=album_rec.album_no
 				left outer join genre_rec on media_rec.genre_no=genre_rec.genre_no
-				where $table.media_no=media_rec.media_no";
+				where $table.media_no=media_rec.media_no
+				and media_rec.media_no=title_rec.media_no
+				and media_rec.media_no=path_rec.media_no";
 				
 			$stmt = $this->mysqli->prepare($sql)
 				or die ("Prepare failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error . $sql);
