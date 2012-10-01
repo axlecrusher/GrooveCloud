@@ -14,6 +14,7 @@
  <script type="text/javascript">
 
 	var myPlaylist;
+	var resultList;
     $(document).ready(function(){
 
 	$("#testClick").click(function() {
@@ -69,41 +70,62 @@ $('.jp-playlist ul:last').sortable({
 
 function doSearch()
 {
-		$('#content #results').stop(true,true);
-		$('#content #spinner').stop(true,true);
-		$('#content #results').fadeOut(100, 'swing', function(){$('#spinner').fadeIn(100);});
-		$("#content #results").load("Search.php?s=" + encodeURIComponent($("#search").val()), showResults);
+	$('#content #results').stop(true,true);
+	$('#content #spinner').stop(true,true);
+	$('#content #results').fadeOut(100, 'swing', function(){$('#spinner').fadeIn(100);});
+//	$("#content #results").load("Search.php?s=" + encodeURIComponent($("#search").val()), showResults);
+//	$("#content #results").load("Search.php?s=" + encodeURIComponent($("#search").val()), showResultsJson);
+	jQuery.getJSON( "Search.php?s=" + encodeURIComponent($("#search").val()), showResultsJson )
 }
 
-function showResults(responseText, textStatus, XMLHttpRequest)
+function showResultsJson(data, textStatus, XMLHttpRequest)
 {
 		if (textStatus == "success")
 		{
 			$('#content #results').stop(true,true);
 			$('#content #spinner').stop(true,true);
 			$('#spinner').fadeOut(100,'swing', function(){$('#content #results').fadeIn(100);} );
+			resultList = data;
+			DrawTableFromJson(data);
 		}
 }
 
-function addSong(title,artist,path)
+function DrawTableFromJson(data)
 {
+	var table = $("#resultTable");
+	table.empty();
+
+	var l = data.length;
+	for (i=0; i<l; i++)
+	{
+		var media = data[i];
+		var html = '<tr><td><a href="javascript:addSong('+i+');">' + media['title'] + '</a></td>'
+			+ '<td>' + media['album'] + '</td>' + '<td>' + media['artist'] + '</td>'
+			+ '<td><a class="addNoteButton" href="javascript:showNotes('+i+');" title="Edit Notes">Add Notes</a></td></tr>';
+		table.append(html);
+	}
+}
+
+function addSong(index)
+{
+	var media = resultList[index];
+	var path = media['path'];
 	var type = path.substring(path.lastIndexOf(".")+1);
-	var media = {title:title,artist:artist};	
 	media[type] = path;
 
 	myPlaylist.add(media);
 	$( ".jp-playlist ul" ).sortable();
 	$( ".jp-playlist ul" ).disableSelection();
-
 }
 
-function showNotes(serial,hash,title)
+function showNotes(index)
 {
-	$('#noteSerial').val(serial);
-	$('#noteHash').val(hash);
+	var media = resultList[index];
+	$('#noteSerial').val(media['serial']);
+	$('#noteHash').val(media['hSerial']);
 	$('#notes').val('');
 	$('#addNotesForm').show();
-	$('#noteTitle').text(title);
+	$('#noteTitle').text(media['title']);
 
 	var data = $( "#addNotesForm" ).serialize();
 	thxr = $.post('GetNote.php', data, function(data, status, jqXHR)
@@ -114,6 +136,7 @@ function showNotes(serial,hash,title)
 		}
 	});
 }
+
   </script>
 </head>
 	<body>
@@ -127,7 +150,14 @@ function showNotes(serial,hash,title)
 <div id="content">
 	<div id="spinner" style="display:none;"><img src="images/290.gif" width="64" height="64"/>
 	</div>
-	<div id="results" style="display:none;">	
+	<div id="results" style="display:none;">
+		<table style="width: 100%;text-align: left;">
+			<thead>
+				<tr><th>Title</th><th>Album</th><th>Artist</th><th></th></tr>
+			</thead>
+			<tbody id="resultTable">
+			</tbody>
+		</table>
 	</div>
 </div>
 <div id="jquery_jplayer_1" class="jp-jplayer"></div>

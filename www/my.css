@@ -146,8 +146,8 @@ div.jp-audio ul.jp-controls {
 	position: relative;
 }
 
-div#resultSet tr:hover { background-color: #fff6be;}
-div#resultSet table { border-collapse:collapse }
+div#results tr:hover { background-color: #fff6be;}
+div#results table { border-collapse:collapse }
 
 .addNoteButton
 {
