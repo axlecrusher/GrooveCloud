@@ -53,7 +53,7 @@ $('.jp-playlist ul:last').sortable({
 
 });
 
-function doSearch()
+function doSearch(terms)
 {
 	$('#content #results').stop(true,true);
 	$('#content #spinner').stop(true,true);
@@ -61,7 +61,11 @@ function doSearch()
 //	$("#content #results").load("Search.php?s=" + encodeURIComponent($("#search").val()), showResults);
 //	$("#content #results").load("Search.php?s=" + encodeURIComponent($("#search").val()), showResultsJson);
 //	jQuery.getJSON( "Search.php?s=" + encodeURIComponent($("#search").val()), showResultsJson )
-	jQuery.get( "Search.php?s=" + encodeURIComponent($("#search").val()), showResultsJson )
+	if (terms == null)
+	{
+		terms = $("#search").val();
+	}
+	jQuery.get( "Search.php?s=" + encodeURIComponent(terms), showResultsJson )
 }
 
 function showResultsJson(data, textStatus, XMLHttpRequest)
@@ -87,7 +91,8 @@ function DrawTableFromJson(data)
 		var media = data[i];
 	
 		var html = '<tr><td><a href="javascript:addSong('+i+');">' + media['title'] + '</a></td>'
-			+ '<td>' + media['album'] + '</td>' + '<td>' + media['artist'] + '</td>'
+			+ '<td><a href="javascript:searchAlbum('+i+');">' + media['album'] + '</a></td>'
+			+ '<td><a href="javascript:searchArtist('+i+');">' + media['artist'] + '</a></td>'
 			+ '<td><a class="addNoteButton" href="javascript:showNotes('+i+');" title="Edit Notes">Add Notes</a></td></tr>';
 		table.append(html);
 	}
@@ -103,6 +108,18 @@ function addSong(index)
 	myPlaylist.add(media);
 	$( ".jp-playlist ul" ).sortable();
 	$( ".jp-playlist ul" ).disableSelection();
+}
+
+function searchAlbum(index)
+{
+	var media = resultList[index];
+	doSearch(media['album']);
+}
+
+function searchArtist(index)
+{
+	var media = resultList[index];
+	doSearch(media['artist']);
 }
 
 function showNotes(index)
