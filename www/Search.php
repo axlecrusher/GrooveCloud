@@ -3,6 +3,7 @@
 	require "MediaSearch.php";
 	require "MediaSearch2.php";
 	require "MediaSearch3.php";
+	require_once('JSONH.class.php');
 
 	if ( isset($_GET['s']) ) DoPost();
 
@@ -30,7 +31,8 @@
 
 			$count++;
 		}
-		echo json_encode($resultArray);
+//		echo json_encode($resultArray);
+		echo jsonh_encode($resultArray);
 	}
 
 ?>
