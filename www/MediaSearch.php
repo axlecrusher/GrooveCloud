@@ -58,14 +58,14 @@
 				$table = 'temp0';
 			}
 
-			$sql = "select $table.media_no,title,artist_rec.txt,album_rec.txt,genre_rec.txt,path
+			$sql = "select $table.media_no,title,artist_table.txt,album_table.txt,genre_table.txt,path
 				from $table,
-				path_rec,title_rec,media_rec left outer join artist_rec on media_rec.artist_no=artist_rec.artist_no
-				left outer join album_rec on media_rec.album_no=album_rec.album_no
-				left outer join genre_rec on media_rec.genre_no=genre_rec.genre_no
+				media_table,title_rec,media_rec left outer join artist_table on media_rec.artist_no=artist_table.artist_no
+				left outer join album_table on media_rec.album_no=album_table.album_no
+				left outer join genre_table on media_rec.genre_no=genre_table.genre_no
 				where $table.media_no=media_rec.media_no
 				and media_rec.media_no=title_rec.media_no
-				and media_rec.media_no=path_rec.media_no";
+				and media_rec.media_no=media_table.media_no";
 				
 			$stmt = $this->mysqli->prepare($sql)
 				or die ("Prepare failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error . $sql);
@@ -92,12 +92,13 @@
 
 	class MediaRecord
 	{
-		public $Serial;
-		public $Title;
-		public $Album;
-		public $Artist;
-		public $Genre;
-		public $Path;
+		public $serial;
+		public $title;
+		public $album;
+		public $artist;
+		public $genre;
+		public $path;
+		public $trackNumber;
 	}
 
 /* Copyright (c) 2012 Joshua Allen
