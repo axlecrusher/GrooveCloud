@@ -127,6 +127,7 @@ sub ProcessData()
 	foreach my $e (@data)
 	{
 		DecodeData($e);
+		CleanData($e);
 		ProcessSQL($e);
 	}
 }
@@ -141,6 +142,15 @@ sub DecodeData
 #		$href->{$k} = "\x{53a0} " . $a; # test to see if utf8 characters are handled properly
 		$href->{$k} = $a;
 	}
+}
+
+sub CleanData
+{
+	my ($href) = @_;
+
+	$href->{TrackNumber} = $href->{Track} if (defined $href->{Track});
+	$href->{TrackNumber} =~ /$\D*(\d+)\D*/;
+	$href->{TrackNumber} = $1;
 }
 
 sub WaitForProcesses()
@@ -200,7 +210,7 @@ sub GetArtistNumber()
 
 	return null if ($x eq '');
 
-	my $q = PrepareStatement("select artist_no from artist_rec where txt=?");
+	my $q = PrepareStatement("select artist_no from artist_table where txt=?");
 	$q->execute($x);
 
 	if (my @row = $q->fetchrow_array)
@@ -208,7 +218,7 @@ sub GetArtistNumber()
 		return $row[0];
 	}
 
-	$q = PrepareStatement("insert into artist_rec set txt=?");
+	$q = PrepareStatement("insert into artist_table set txt=?");
 	unless ($q->execute($x))
 	{
 		return GetArtistNumber($x) if ($q->{ix_sqlerrd}[1] == 23000);
@@ -223,7 +233,7 @@ sub GetAlbumNumber()
 
 	return null if ($x eq '');
 
-	my $q = PrepareStatement("select album_no from album_rec where txt=?");
+	my $q = PrepareStatement("select album_no from album_table where txt=?");
 	$q->execute($x);
 
 	if (my @row = $q->fetchrow_array)
@@ -231,7 +241,7 @@ sub GetAlbumNumber()
 		return $row[0];
 	}
 
-	$q = PrepareStatement("insert into album_rec set txt=?");
+	$q = PrepareStatement("insert into album_table set txt=?");
 	unless ($q->execute($x))
 	{
 		return GetAlbumNumber($x) if ($q->{ix_sqlerrd}[1] == 23000);
@@ -246,7 +256,7 @@ sub GetGenreNumber()
 
 	return null if ($x eq '');
 
-	my $q = PrepareStatement("select genre_no from genre_rec where txt=?");
+	my $q = PrepareStatement("select genre_no from genre_table where txt=?");
 	$q->execute($x);
 
 	if (my @row = $q->fetchrow_array)
@@ -254,7 +264,7 @@ sub GetGenreNumber()
 		return $row[0];
 	}
 
-	$q = PrepareStatement("insert into genre_rec set txt=?");
+	$q = PrepareStatement("insert into genre_table set txt=?");
 	unless ($q->execute($x))
 	{
 		return GetGenreNumber($x) if ($q->{ix_sqlerrd}[1] == 23000);
@@ -267,20 +277,29 @@ sub InsertMediaRecord()
 {
 	my ($data) = @_;
 
-	my $q = PrepareStatement("insert ignore into media_rec (album_no,artist_no,genre_no,track_number,year,duration,filesize) values (?,?,?,?,?,?,?)");
+	my $q = PrepareStatement("replace into media_rec (media_no,album_no,artist_no,genre_no,track_number,year,duration,filesize) values (?,?,?,?,?,?,?,?)");
 	my $qt = PrepareStatement("insert ignore into title_rec (media_no,title) values (?,?)");
-	my $qp = PrepareStatement("insert ignore into path_rec (media_no,path) values (?,?)");
+	my $qp = PrepareStatement("insert ignore into media_table (path) values (?)");
+	my $qe = PrepareStatement("select media_no from media_table where path=?");
 
-	$q->execute($data->{AlbumNumber},$data->{ArtistNumber},$data->{GenreNumber},
+	my $serial = 0;
+	$qe->execute($data->{path}) or die("Could not insert path");
+	if (my @row = $qe->fetchrow_array)
+	{
+		$serial = $row[0];
+	}
+	else
+	{
+		$qp->execute($data->{path}) or die("Could not insert path");
+		$serial = $dbh->{ q{mysql_insertid} }; #last insert ID
+	}
+
+	$q->execute($serial, $data->{AlbumNumber},$data->{ArtistNumber},$data->{GenreNumber},
 		$data->{TrackNumber}, $data->{Year}, $data->{MediaDuration}, $data->{FileSize});
 
-	my $r = $dbh->{ q{mysql_insertid} }; #last insert ID
+	$qt->execute($serial, $data->{Title}) or die("Could not insert title");
 
-	$qp->execute($r, $data->{path}) or die("Could not insert path");
-
-	$qt->execute($r, $data->{Title}) or die("Could not insert title");
-
-	return $r;
+	return $serial;
 }
 
 sub CreateWordMap()
