@@ -20,14 +20,9 @@
 
 		foreach ($results as $r)
 		{
-			$songData = array(	'title' => $r->Title,
-								'artist' => $r->Artist,
-								'album' => $r->Album,
-								'serial' => $r->Serial,
-								'hSerial' => HashData( $r->Serial ),
-								'path' => $r->Path);
+			$r->hSerial = HashData( $r->serial );
 
-			array_push($resultArray,$songData);
+			array_push($resultArray,$r);
 
 			$count++;
 		}
