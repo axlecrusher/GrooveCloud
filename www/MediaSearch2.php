@@ -19,14 +19,14 @@
 
 //echo $terms;
 //			$this->mysqli->query("create temporary table result(media_no bigint not null, primary key(media_no)) engine=MEMORY");
-			$stmt = $this->mysqli->prepare("select media_rec.media_no,title,artist_rec.txt,album_rec.txt,genre_rec.txt,path
-				from search_table,title_rec,path_rec,media_rec left outer join artist_rec on media_rec.artist_no=artist_rec.artist_no
-				left outer join album_rec on media_rec.album_no=album_rec.album_no
-				left outer join genre_rec on media_rec.genre_no=genre_rec.genre_no
+			$stmt = $this->mysqli->prepare("select media_rec.media_no,title,artist_table.txt,album_table.txt,genre_table.txt,path
+				from search_table,title_rec,media_table,media_rec left outer join artist_table on media_rec.artist_no=artist_table.artist_no
+				left outer join album_table on media_rec.album_no=album_table.album_no
+				left outer join genre_table on media_rec.genre_no=genre_table.genre_no
 				where match (search_table.terms) against (?)
 				and search_table.media_no=media_rec.media_no
 				and media_rec.media_no=title_rec.media_no
-				and media_rec.media_no=path_rec.media_no
+				and media_rec.media_no=media_table.media_no
 				limit 0,30")
 					or die("Prepare failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error);
 

@@ -52,14 +52,14 @@
 			$stmt->execute()
 				or die("Execute failed: (" . $stmt->errno . ") " . $stmt->error);
 
-			$sql = "select results.media_no,title,artist_rec.txt,album_rec.txt,genre_rec.txt,path
-				from results,path_rec,title_rec,
-				media_rec left outer join artist_rec on media_rec.artist_no=artist_rec.artist_no
-				left outer join album_rec on media_rec.album_no=album_rec.album_no
-				left outer join genre_rec on media_rec.genre_no=genre_rec.genre_no
+			$sql = "select results.media_no,title,artist_table.txt,album_table.txt,genre_table.txt,path,track_number
+				from results,media_table,title_rec,
+				media_rec left outer join artist_table on media_rec.artist_no=artist_table.artist_no
+				left outer join album_table on media_rec.album_no=album_table.album_no
+				left outer join genre_table on media_rec.genre_no=genre_table.genre_no
 				where results.media_no=media_rec.media_no
 				and media_rec.media_no=title_rec.media_no
-				and media_rec.media_no=path_rec.media_no";
+				and media_rec.media_no=media_table.media_no";
 				
 			$stmt = $this->mysqli->prepare($sql)
 				or die ("Prepare failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error . $sql);
@@ -70,13 +70,13 @@
 			$results = array();
 
 			$media = new MediaRecord();
-			$stmt->bind_result ( $media->Serial, $media->Title,$media->Artist,$media->Album,$media->Genre,$media->Path );
+			$stmt->bind_result ( $media->serial, $media->title,$media->artist,$media->album,$media->genre,$media->path,$media->trackNumber );
 
 			while ($stmt->fetch())
 			{
 				$results[] = $media;
 				$media = new MediaRecord();
-				$stmt->bind_result ( $media->Serial, $media->Title,$media->Artist,$media->Album,$media->Genre,$media->Path );
+				$stmt->bind_result ( $media->serial, $media->title,$media->artist,$media->album,$media->genre,$media->path,$media->trackNumber );
 			}
 
 			return $results;
