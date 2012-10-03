@@ -28,7 +28,7 @@
 	<div id="results" style="display:none;">
 		<table style="width: 100%;text-align: left;">
 			<thead>
-				<tr><th>Title</th><th>Album</th><th>Artist</th><th></th></tr>
+				<tr><th>Track</th><th>Title</th><th>Album</th><th>Artist</th><th></th></tr>
 			</thead>
 			<tbody id="resultTable">
 			</tbody>

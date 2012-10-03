@@ -90,7 +90,7 @@ function DrawTableFromJson(data)
 	{
 		var media = data[i];
 	
-		var html = '<tr><td><a href="javascript:addSong('+i+');">' + media['title'] + '</a></td>'
+		var html = '<tr><td>'+media['trackNumber']+'</td><td><a href="javascript:addSong('+i+');">' + media['title'] + '</a></td>'
 			+ '<td><a href="javascript:searchAlbum('+i+');">' + media['album'] + '</a></td>'
 			+ '<td><a href="javascript:searchArtist('+i+');">' + media['artist'] + '</a></td>'
 			+ '<td><a class="addNoteButton" href="javascript:showNotes('+i+');" title="Edit Notes">Add Notes</a></td></tr>';
