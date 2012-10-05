@@ -12,6 +12,7 @@
 	<script type="text/javascript" src="add-on/jplayer.playlist.drag.js"></script>
 	<link type="text/css" href="my.css" rel="stylesheet" />
 	<script type="text/javascript" src="jsonh.js"></script>
+	<script type="text/javascript" src="jquery.sortElements.js"></script>
 	<script type="text/javascript" src="GrooveCloud.js"></script>
 </head>
 	<body>
@@ -28,7 +29,7 @@
 	<div id="results" style="display:none;">
 		<table style="width: 100%;text-align: left;">
 			<thead>
-				<tr><th>Track</th><th>Title</th><th>Album</th><th>Artist</th><th></th></tr>
+				<tr><th id="trackHeader">Track</th><th id="titleHeader">Title</th><th id="albumHeader">Album</th><th id="artistHeader">Artist</th><th></th></tr>
 			</thead>
 			<tbody id="resultTable">
 			</tbody>

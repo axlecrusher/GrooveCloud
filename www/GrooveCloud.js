@@ -50,7 +50,8 @@ $('.jp-playlist ul:last').sortable({
 	$("#notes-cancel").click(function() {
 		$( "#addNotesForm" ).hide();
 	});
-
+	
+	MakeResultsSortable();
 });
 
 function doSearch(terms)
@@ -141,6 +142,35 @@ function showNotes(index)
 	});
 }
 
+function MakeResultsSortable()
+{
+	var resultTable = $('table');
+    
+	$('#trackHeader, #titleHeader, #albumHeader, #artistHeader')
+		.wrapInner('<span title="sort this column"/>')
+		.each(function(){
+            
+		var th = $(this), thIndex = th.index(), inverse = false;
+
+		th.click(function(){
+			resultTable.find('td').filter(function(){
+				return $(this).index() === thIndex;
+			}).sortElements(function(a, b){
+				var t = +$.text([a]) > +$.text([b]);
+				if ( isNaN($.text([a])) || isNaN($.text([b])))
+					t = $.text([a]) > $.text([b]);
+
+				return t ?
+						inverse ? -1 : 1
+						: inverse ? 1 : -1;
+			}, function(){
+				// parentNode is the element we want to move
+				return this.parentNode; 
+			});
+			inverse = !inverse;
+		});
+	});
+}
 /* Copyright (c) 2012 Joshua Allen
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
