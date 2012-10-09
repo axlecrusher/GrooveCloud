@@ -16,8 +16,8 @@
 		{
 			$searchString = preg_replace("/[^\w\s]/", '', $searchString);
 			$search = trim($searchString);
+			$terms = array_unique( preg_split('/\s+/', $search) );
 
-			$terms = preg_split('/\s+/', $search);
 			$termsCount = count($terms);
 
 			$paramsQ = str_repeat("?,", $termsCount);
